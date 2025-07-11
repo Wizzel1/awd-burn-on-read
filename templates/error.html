@@ -1,0 +1,36 @@
+{% extends "__baseLayout.html" %}
+
+{% block title %}Message Not Found - Burn on Read{% endblock %}
+
+{% block content %}
+<div style="text-align: center;">
+    <div style="font-size: 4rem; margin-bottom: 1rem;">🔥</div>
+    
+    <h2>Message Already Burned</h2>
+    
+    <p>
+        {% if errorType == 'already_read' %}
+            This message has already been read and destroyed.
+        {% elif errorType == 'not_found' %}
+            This message doesn't exist or has expired.
+        {% elif errorType == 'invalid_link' %}
+            The link you followed is invalid or malformed.
+        {% else %}
+            This message is no longer available.
+        {% endif %}
+    </p>
+    
+    <article>
+        <h3>What happened?</h3>
+        <p>
+            Burn-on-read messages are designed to be viewed only once. Once someone reads the message, 
+            it's permanently deleted for security reasons.
+        </p>
+    </article>
+    
+    <div>
+        <button onclick="window.location.href='/'">📝 Create Your Own Message</button>
+        <button onclick="window.history.back()" class="secondary">← Go Back</button>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,97 @@
+{% extends "__baseLayout.html" %}
+
+{% block title %}
+{% if title %}{{ title }} - {% endif %}Burn on Read
+{% endblock %}
+
+{% block content %}
+{% if title %}
+<div style="text-align: center; margin-bottom: 2rem;">
+    <h2>{{ title }}</h2>
+</div>
+{% endif %}
+
+<article>
+    <h3>🔥 This message will be destroyed after you read it</h3>
+    <p>This is a one-time message. Once you close this page or navigate away, the content will be permanently deleted.</p>
+</article>
+
+<article>
+    <div style="white-space: pre-wrap; word-wrap: break-word;">{{ content }}</div>
+</article>
+
+<div>
+    <button onclick="copyContent()">📋 Copy Content</button>
+    <button onclick="confirmDestroy()" class="secondary">🔥 Destroy Now</button>
+</div>
+
+<details>
+    <summary>About this message</summary>
+    <ul>
+        <li><strong>Created:</strong> {{ createdAt | date('MMMM Do, YYYY [at] h:mm A') }}</li>
+        <li><strong>Status:</strong> This message will be automatically destroyed when you leave this page</li>
+        <li><strong>One-time only:</strong> This link will never work again</li>
+    </ul>
+</details>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let isDestroyed = false;
+    
+    function copyContent() {
+        const content = `{{ content | replace('"', '\\"') | replace('\n', '\\n') }}`;
+        
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(content);
+        } else {
+            const textArea = document.createElement('textarea');
+            textArea.value = content;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.error('Copy failed');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+    }
+    
+    function confirmDestroy() {
+        if (confirm('Are you sure you want to destroy this message now? This cannot be undone.')) {
+            destroyMessage();
+        }
+    }
+    
+    function destroyMessage() {
+        if (isDestroyed) return;
+        isDestroyed = true;
+        
+        fetch(window.location.pathname + '/destroy', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(() => {
+            alert('Message destroyed');
+            window.location.href = '/';
+        }).catch(() => {
+            alert('Message destroyed');
+            window.location.href = '/';
+        });
+    }
+    
+    // Auto-destroy when leaving the page
+    window.addEventListener('beforeunload', function(e) {
+        if (!isDestroyed) {
+            destroyMessage();
+        }
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,78 @@
+{% extends "__baseLayout.html" %}
+
+{% block title %}Link Created - Burn on Read{% endblock %}
+
+{% block content %}
+<article>
+    <h3>✅ Success!</h3>
+    <p>Your burn-on-read message has been created. Share the link below:</p>
+</article>
+
+{% if title %}
+<div>
+    <label>Message title:</label>
+    <input type="text" value="{{ title }}" readonly>
+</div>
+{% endif %}
+
+<div>
+    <label for="burn-link">Your burn-on-read link:</label>
+    <div class="flex">
+        <input
+            type="text"
+            id="burn-link"
+            value="{{ link }}"
+            readonly
+            onclick="this.select()"
+        >
+        <button onclick="copyToClipboard()" id="copy-btn">
+            📋 Copy
+        </button>
+    </div>
+</div>
+
+<article>
+    <h3>⚠️ Important Reminders</h3>
+    <ul>
+        <li><strong>One-time use:</strong> The link will stop working after being visited once</li>
+        <li><strong>No recovery:</strong> Once viewed, the message is permanently deleted</li>
+        <li><strong>Share carefully:</strong> Anyone with this link can read and destroy the message</li>
+    </ul>
+</article>
+
+<div>
+    <button onclick="window.location.href='/'" role="button" class="secondary">
+        📝 Create Another Message
+    </button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function copyToClipboard() {
+        const linkInput = document.getElementById('burn-link');
+        const copyBtn = document.getElementById('copy-btn');
+        
+        linkInput.select();
+        linkInput.setSelectionRange(0, 99999);
+        
+        try {
+            document.execCommand('copy');
+            copyBtn.textContent = '✅ Copied!';
+            
+            setTimeout(() => {
+                copyBtn.textContent = '📋 Copy';
+            }, 2000);
+        } catch (err) {
+            console.error('Failed to copy: ', err);
+        }
+    }
+    
+    // Auto-select link on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const linkInput = document.getElementById('burn-link');
+        linkInput.focus();
+        linkInput.select();
+    });
+</script>
+{% endblock %} 

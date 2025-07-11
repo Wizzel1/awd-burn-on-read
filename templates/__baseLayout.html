@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Burn on Read{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        main {
+            min-height: 60vh;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .flex {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .flex input[readonly] {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <header>
+            <h1>🔥 Burn on Read</h1>
+            <p>Share text that self-destructs after being read once</p>
+        </header>
+        
+        {% block content %}{% endblock %}
+        
+        <footer>
+            <small>⚠️ Once a link is visited, the content is permanently destroyed</small>
+        </footer>
+    </main>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html> 
