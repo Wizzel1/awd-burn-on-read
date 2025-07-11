@@ -10,11 +10,20 @@ import {
 const app = express();
 const port = process.env.PORT || 3000;
 
-nunjucks.configure(path.join(__dirname, "../templates"), {
+const env = nunjucks.configure(path.join(__dirname, "../templates"), {
   autoescape: true,
   express: app,
   watch: true,
 });
+
+env.addFilter("date", (date: Date, format: string) => {
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+});
+
 
 function errorHandler(
     err: any,
