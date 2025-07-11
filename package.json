@@ -2,17 +2,17 @@
   "name": "awd-burn-on-read",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node src/index.ts",
-    "dev": "nodemon --exec ts-node src/index.ts"
+    "start": "ts-node src/app.ts",
+    "dev": "nodemon --exec ts-node src/app.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
-    "devDependencies": {
+  "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/fs-extra": "^11.0.4",
@@ -25,11 +25,13 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@picocss/pico": "^2.1.1",
     "cors": "^2.8.5",
     "dotenv": "^17.1.0",
     "express": "^5.1.0",
     "fs-extra": "^11.3.0",
     "nunjucks": "^3.2.4",
-    "slugify": "^1.6.6"
+    "slugify": "^1.6.6",
+    "zod": "^4.0.5"
   }
 }
