@@ -10,6 +10,15 @@ endblock %} {% block content %}
   <label>Message title:</label>
   <input type="text" value="{{ title }}" readonly />
 </div>
+{% endif %} {% if expiresAt %}
+<div>
+  <label>Auto-expires on:</label>
+  <input type="text" value="{{ expiresAt | date }}" readonly />
+  <small
+    >The message will be automatically deleted at this date/time if not read
+    before then.</small
+  >
+</div>
 {% endif %}
 
 <div>
@@ -33,9 +42,15 @@ endblock %} {% block content %}
       <strong>One-time use:</strong> The link will stop working after being
       visited once
     </li>
+    {% if expiresAt %}
     <li>
-      <strong>No recovery:</strong> Once viewed, the message is permanently
-      deleted
+      <strong>Auto-expiration:</strong> The message will also be automatically
+      deleted on {{ expiresAt | date }}
+    </li>
+    {% endif %}
+    <li>
+      <strong>No recovery:</strong> Once viewed or expired, the message is
+      permanently deleted
     </li>
     <li>
       <strong>Share carefully:</strong> Anyone with this link can read and

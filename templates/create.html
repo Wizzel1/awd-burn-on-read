@@ -4,8 +4,9 @@ Read{% endblock %} {% block content %}
   <article>
     <h3>⚠️ Important</h3>
     <p>
-      Your message will be permanently destroyed after being read once. Make
-      sure to save any important information elsewhere before sharing the link.
+      Your message will be permanently destroyed after being read once OR when
+      it expires (if you set an expiration time). Make sure to save any
+      important information elsewhere before sharing the link.
     </p>
   </article>
 
@@ -31,17 +32,41 @@ Read{% endblock %} {% block content %}
     />
   </div>
 
+  <div>
+    <label for="ttl">Auto-expire after (optional):</label>
+    <select id="ttl" name="ttl">
+      <option value="">Never expire (manual read only)</option>
+      <option value="3600">1 hour</option>
+      <option value="21600">6 hours</option>
+      <option value="86400">1 day</option>
+      <option value="259200">3 days</option>
+      <option value="604800">1 week</option>
+      <option value="2592000">30 days</option>
+    </select>
+    <small
+      >The message will be automatically deleted after this time, even if not
+      read.</small
+    >
+  </div>
+
   <button type="submit">🔥 Create Burn-on-Read Link</button>
 </form>
 
 <details>
   <summary>How it works</summary>
   <ul>
-    <li>Enter your text and click "Create Burn-on-Read Link"</li>
-    <li>You'll receive a unique link that you can share</li>
+    <li>Enter your text and optionally set an expiration time</li>
+    <li>Click "Create Burn-on-Read Link" to get a unique link</li>
+    <li>Share the link with your intended recipient</li>
     <li>When someone visits the link, they'll see your message</li>
     <li>After viewing, the message is permanently deleted</li>
-    <li>The link becomes invalid and cannot be used again</li>
+    <li>
+      If you set an expiration time, the message will also be deleted
+      automatically when it expires
+    </li>
+    <li>
+      Once deleted (either by reading or expiration), the link becomes invalid
+    </li>
   </ul>
 </details>
 {% endblock %} {% block scripts %}

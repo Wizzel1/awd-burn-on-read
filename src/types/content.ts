@@ -1,13 +1,22 @@
 import { z } from "zod";
 
-
-export const contentSchema = z.object({
+export const contentSchema = z
+  .object({
     content: z.string().min(1),
     title: z.string().optional(),
-    createdAt: z.string().optional(),
-}).transform((data) => ({
+    createdAt: z.union([z.string(), z.date()]).optional(),
+    expiresAt: z.union([z.string(), z.date()]).optional(),
+  })
+  .transform((data) => ({
     ...data,
-    createdAt: data.createdAt ? new Date(data.createdAt) : undefined
-}));
+    createdAt:
+      typeof data.createdAt === "string"
+        ? new Date(data.createdAt)
+        : data.createdAt,
+    expiresAt:
+      typeof data.expiresAt === "string"
+        ? new Date(data.expiresAt)
+        : data.expiresAt,
+  }));
 
 export type Content = z.infer<typeof contentSchema>;

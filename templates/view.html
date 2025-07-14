@@ -29,6 +29,12 @@
       <strong>Created:</strong> {{ createdAt | date('MMMM Do, YYYY [at] h:mm A')
       }}
     </li>
+    {% if expiresAt %}
+    <li>
+      <strong>Would have expired:</strong> {{ expiresAt | date('MMMM Do, YYYY
+      [at] h:mm A') }} (but was read first)
+    </li>
+    {% endif %}
     <li>
       <strong>Status:</strong> This message will be automatically destroyed when
       you leave this page

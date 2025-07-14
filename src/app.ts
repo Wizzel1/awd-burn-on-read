@@ -5,7 +5,11 @@ import {
   saveContentToFile,
   getContentById,
   deleteFileById,
+  cleanupExpiredFiles,
+  createExpirationDate,
 } from "../src/services/fileService";
+import z from "zod";
+import { contentSchema } from "./types/content";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -24,18 +28,17 @@ env.addFilter("date", (date: Date, format: string) => {
   });
 });
 
-
 function errorHandler(
-    err: any,
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) {
-    console.error(err.stack);
-    res.status(500).render("error.html", {
-      errorType: "server_error",
-    });
-  }
+  err: any,
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) {
+  console.error(err.stack);
+  res.status(500).render("error.html", {
+    errorType: "server_error",
+  });
+}
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -46,7 +49,7 @@ app.get("/", (req, res) => {
 });
 
 app.post("/create", async (req, res) => {
-  const { content, title } = req.body;
+  const { content, title, ttl } = req.body;
 
   if (!content || content.trim() === "") {
     return res.status(400).render("error.html", {
@@ -54,7 +57,25 @@ app.post("/create", async (req, res) => {
       message: "Content cannot be empty",
     });
   }
-  const id = await saveContentToFile({ content, title, createdAt: new Date() });
+  const ttlParsed = z.coerce.number().parse(ttl);
+  const ttlSeconds = ttl ? ttlParsed : undefined;
+  console.log(ttlSeconds);
+  const expiresAt = createExpirationDate(ttlSeconds);
+
+  const contentParsed = contentSchema.safeParse({
+    content,
+    title,
+    createdAt: new Date(),
+    expiresAt,
+  });
+  if (contentParsed.error) {
+    return res.status(400).render("error.html", {
+      errorType: "invalid_content",
+      message: "Content cannot be empty",
+    });
+  }
+
+  const id = await saveContentToFile(contentParsed.data);
   const link = `${req.protocol}://${req.get("host")}/read/${id}`;
   res.redirect(`/success?id=${id}&link=${encodeURIComponent(link)}`);
 });
@@ -72,6 +93,7 @@ app.get("/success", async (req, res) => {
     link: decodeURIComponent(link as string),
     title: content.title,
     id: id,
+    expiresAt: content.expiresAt,
   });
 });
 
@@ -90,14 +112,46 @@ app.get("/read/:id", async (req, res) => {
     content: file.content,
     title: file.title,
     createdAt: file.createdAt,
+    expiresAt: file.expiresAt,
     id: id,
   });
+});
+
+app.delete("/content/:id", async (req, res) => {
+  const { id } = req.params;
+  const content = await getContentById(id);
+
+  if (!content) {
+    return res.status(404).json({
+      success: false,
+      message: "Content not found or already expired",
+    });
+  }
+
+  await deleteFileById(id);
+  res.json({ success: true, message: "Content deleted successfully" });
 });
 
 app.post("/read/:id/destroy", async (req, res) => {
   const { id } = req.params;
   await deleteFileById(id);
   res.json({ success: true, message: "Message destroyed" });
+});
+
+//TODO: Add a cron job to cleanup expired files
+app.post("/ttl-cleanup", async (req, res) => {
+  try {
+    const cleanedCount = await cleanupExpiredFiles();
+    res.json({
+      success: true,
+      message: `Cleaned up ${cleanedCount} expired files`,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error during cleanup",
+    });
+  }
 });
 
 app.get("/error", (req, res) => {
@@ -107,7 +161,6 @@ app.get("/error", (req, res) => {
   });
 });
 
-// 404 handler
 app.use((req, res) => {
   res.status(404).render("error.html", {
     errorType: "not_found",
